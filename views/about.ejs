@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./main.css">
+    <title><%= title %></title>
+</head>
+<body>
+    <%- include('./part/head.ejs') %>
+    <div id="app">
+        <h1 v-if="servers.length === 0">ничего тут нету</h1>
+    </div>
+    <ul v-else>
+        <li v-for="server in servers">
+            {{ server.title }}
+            <strong>{{ server.price }}</strong>
+        </li>
+    </ul>
+</body>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="/app.js"></script>
+</html>
