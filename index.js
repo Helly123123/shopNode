@@ -1,5 +1,6 @@
 import express from 'express'
 import path from 'path'
+import passport from 'passport'
 import {requserTime, Logger} from './middlewares.js'
 import serverRouts from './routs/server.js'
 import productRouts from './routs/addProduct.js'
@@ -8,6 +9,7 @@ import {Router} from 'express'
 import {conn} from './database/database.js'
 import cors from 'cors'
 import databaseRouts from './routs/selectAllFromdb.js'
+
 const __dirname = path.resolve()
 const PORT = process.env.PORT ?? 3000
 export const app = express()
@@ -30,6 +32,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }));
 
+app.use(passport.initialize())
 
 app.use(authRouts)
 app.use(serverRouts)

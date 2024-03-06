@@ -1,6 +1,8 @@
 import bicrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import {conn} from '../database/database.js'
+import express from 'express'
+const router = express.Router()
 
 
 export const login = function(req, res) {
@@ -42,6 +44,12 @@ export const login = function(req, res) {
       }}})}
 
 
+export const errorReg = function(req, res) {
+  res.status(200).json({
+    message: 'Вы успешно зарегестрировались'
+  })
+}
+
 export const register = async function(req, res) {
     let email = req.body.email
     conn.query('SELECT * FROM users WHERE email = ?', [email], (error, results) => {
@@ -49,9 +57,8 @@ export const register = async function(req, res) {
           console.error(error);
         } else {
           if (results.length > 0) {
-            res.status(409).json({
-                message: 'Такое емаил уже есть'
-            })
+            res.status(200).send('привет')
+           
           } else {
 
             const stlt = bicrypt.genSaltSync(10)
@@ -61,39 +68,14 @@ export const register = async function(req, res) {
                 password = bicrypt.hashSync(pass, stlt),
                 name = req.body.name 
             
-            conn.query(`INSERT INTO users(id, name, email, password, number) VALUES(6,'${name}', '${email}', '${password}', 88)`, (err, result) => {
+            conn.query(`INSERT INTO users(id, name, email, password, number) VALUES(21,'${name}', '${email}', '${password}', 88)`, (err, result) => {
               if (err) {
                 console.error('Error adding user: ' + err.stack);
                 return;
               }
-              res.status(201).json({
-                message: 'Вы успешно зарегестрировались'
-              })
+              res.status(201).send('все окей')
             });
           }
         }
       });
 }
-    // const candidat =  conn.query(`SELECT 1 FROM users WHERE email='${email}'`)
-    //     if (candidat) {
-    //         res.status(409).json({
-    //             message: 'Такое емаил уже есть'
-    //         })
-    //     } else {
-    //     //     const salt = bicrypt.genSaltSync(10)
-    //     //     const passw = req.body.password
-    
-    //     //     let email = req.body.email,
-    //     //         password = bicrypt.hashSync(passw, salt)
-            
-            
-    
-    //     //    try  {
-    //     //     const sql = `INSERT INTO users(id, name, email, password, number) VALUES(2,'helly', '${email}', '${password}', 88)`
-    //     //    } catch(e) {
-            
-    //     //    }
-        
-    //     console.log('GOOD')
-    //     console.log(email + ' po')
-    //     }}
