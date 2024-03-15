@@ -42,14 +42,50 @@ app.use(databaseRouts)
 
  
 
-let a = 'pipka'
-app.get('/datab', (req, res) => {
-  conn.query(`SELECT * FROM users WHERE email='${a}'`, (err, results) => {
-    if (err) {
-      console.error('Ошибка выполнения запроса: ' + err.stack);
-      return res.status(500).send('Ошибка выполнения запроса');
-    }
+// let a = 'pipka'
+// app.get('/datab', (req, res) => {
+//   conn.query(`SELECT * FROM product WHERE email='${a}'`, (err, results) => {
+//     if (err) {
+//       console.error('Ошибка выполнения запроса: ' + err.stack);
+//       return res.status(500).send('Ошибка выполнения запроса');
+//     }
     
+//     res.json(results);
+//   });
+// });
+
+app.get('/search', (req, res) => {
+  const searchTerm = req.query.term;
+  conn.query(`SELECT * FROM product WHERE model='${searchTerm}'`, (err, results) => {
+    if (err) {
+      res.status(500).send('Error searching for products');
+      return;
+    }
+    res.json(results);
+  });
+});
+
+app.get('/manufacturer', (req, res) => {
+  const searchMan = req.query.term;
+  conn.query(`SELECT * FROM product WHERE manufacturer='${searchMan}'`, (err, results) => {
+    if (err) {
+      res.status(500).send('Error searching for products');
+      return;
+    }
+    res.json(results);
+  });
+});
+
+
+app.get('/price', (req, res) => {
+  
+  const OnePrice = req.query.one;
+  const TwoPrice = req.query.two;
+  conn.query(`SELECT * FROM product WHERE price >= ${OnePrice} AND price <= ${TwoPrice}`, (err, results) => {
+    if (err) {
+      res.status(500).send('Error searching for products');
+      return;
+    }
     res.json(results);
   });
 });

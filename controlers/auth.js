@@ -25,16 +25,20 @@ export const login = function(req, res) {
                     email: results
     
                   }, 'dev-jsv', {expiresIn: 60 * 60})
-        
-                  res.status(200).json({
-                    toket: token
-                  })
+                  let candidatName = conn.query('SELECT name FROM users WHERE email = ?', [email], (error, nameBd) =>{
+                    if (error) {
+                      console.log(error)
+                    }else {
+                      const data = {
+                        name: nameBd[0].name,
+                        email: req.body.email
+                      }
+                      res.status(200).json(data)
+                    }})
+                  
                 }else {
-                  res.status(401).json({
-                    message: 'Пароли не совпадают'
-                  })
+                  res.status(401).send('Пароли не совпадают')
                 }
-
           }
         })
       } else {
@@ -67,8 +71,10 @@ export const register = async function(req, res) {
             let email = req.body.email,
                 password = bicrypt.hashSync(pass, stlt),
                 name = req.body.name 
-            
-            conn.query(`INSERT INTO users(id, name, email, password, number) VALUES(21,'${name}', '${email}', '${password}', 88)`, (err, result) => {
+                function generateUserId() {
+                  return Math.floor(Math.random() * 1000) + 1; // Генерация случайного числа от 1 до 1000
+              }
+            conn.query(`INSERT INTO users(id, name, email, password, number) VALUES(${generateUserId()},'${name}', '${email}', '${password}', 88)`, (err, result) => {
               if (err) {
                 console.error('Error adding user: ' + err.stack);
                 return;
