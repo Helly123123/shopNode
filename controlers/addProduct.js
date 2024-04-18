@@ -1,7 +1,5 @@
 import {conn} from '../database/database.js'
 
-
-
 export const addProduct = (req, res) => {
   let title = req.body.title,
         model = req.body.model,
@@ -19,3 +17,4 @@ conn.query(sql, function(err, results) {
     console.log(results);
 });
 };
+
