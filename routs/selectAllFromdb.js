@@ -3,9 +3,6 @@ import {selectAllFromdb} from '../controlers/selectAllfromdb.js'
 const router = express.Router()
 
 
-
-
-
 router.get('/database', selectAllFromdb)
   
 
