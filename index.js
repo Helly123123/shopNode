@@ -1,5 +1,5 @@
 import express from 'express'
-import path from 'path'
+
 import passport from 'passport'
 import {requserTime, Logger} from './middlewares.js'
 import serverRouts from './routs/server.js'
@@ -12,6 +12,8 @@ import {conn} from './database/database.js'
 import cors from 'cors'
 import databaseRouts from './routs/selectAllFromdb.js'
 import searchProductDB from './routs/searchProduct.js'
+import multer from 'multer'
+import path from 'path'
 
 import nodemailer from 'nodemailer'
 
@@ -187,7 +189,7 @@ app.get('/search', (req, res) => {
                   });
       }
 
-      else if (manufacturer.length > 0 && search.length === 0 && onePrice != undefined && twoPrice === undefined) {
+      else if (manufacturer.length > 0 && search.length === 0 && onePrice != undefined  && twoPrice === undefined) {
         conn.query(`SELECT * FROM product WHERE price >= ${Number(onePrice)} AND price <= ${200000000}  AND manufacturer='${manufacturer}'`, (err, results) => {
           if (err) {
             res.status(500).send('Error searching for products');
@@ -483,6 +485,22 @@ import { unescape } from 'querystring'
     });
 
 
+    const storage = multer.diskStorage({
+      destination: function (req, file, cb) {
+        cb(null, 'uploads/')
+      },
+      filename: function (req, file, cb) {
+        cb(null, file.originalname)
+      }
+    });
+    
+    const upload = multer({ storage: storage });
+    
+    app.post('/upload', upload.single('image'), (req, res) => {
+      res.send(req.file);
+    });
+    
+    app.use(express.static('uploads'));
 app.listen(PORT, ()=> {
     console.log(`Все работае! Ваш порт ${PORT}`)
 }) //запуск приложения
