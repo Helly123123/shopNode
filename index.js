@@ -14,7 +14,7 @@ import databaseRouts from './routs/selectAllFromdb.js'
 import searchProductDB from './routs/searchProduct.js'
 import multer from 'multer'
 import path from 'path'
-
+import fs from 'fs'
 import nodemailer from 'nodemailer'
 
 
@@ -118,15 +118,6 @@ app.get('/search', (req, res) => {
     onePrice =  req.query.onePrice,
     twoPrice =  req.query.twoPrice
 
-    // conn.query('SELECT * FROM product', (err, results) => {
-    //   if (err) {
-    //     console.error('Ошибка выполнения запроса: ' + err.stack);
-    //     return res.status(500).send('Ошибка выполнения запроса');
-    //   }
-      
-    //   res.json(results);
-    // });
-     
      console.log('============================================')
      console.log('производ ' + manufacturer + '' + typeof(manufacturer))
      console.log('модель ' + search + '' + typeof(search))
@@ -178,8 +169,8 @@ app.get('/search', (req, res) => {
       } 
     }
     
-    if (onePrice != undefined && twoPrice === undefined) {
-      if (manufacturer.length === 0 && search.length === 0 && onePrice != undefined && twoPrice === undefined) {
+    if (onePrice != undefined && twoPrice === undefined || onePrice === '729.325' ||  twoPrice === '729.325') {
+      if (manufacturer.length === 0 && search.length === 0 && onePrice != undefined && (twoPrice === undefined || twoPrice === '729.325')) {
         conn.query(`SELECT * FROM product WHERE price >= ${Number(onePrice)} AND price <= ${200000000}`, (err, results) => {
                     if (err) {
                       res.status(500).send('Error searching for products');
@@ -189,7 +180,7 @@ app.get('/search', (req, res) => {
                   });
       }
 
-      else if (manufacturer.length > 0 && search.length === 0 && onePrice != undefined  && twoPrice === undefined) {
+      else if (manufacturer.length > 0 && search.length === 0 && onePrice != undefined  && (twoPrice === undefined || twoPrice === '729.325')) {
         conn.query(`SELECT * FROM product WHERE price >= ${Number(onePrice)} AND price <= ${200000000}  AND manufacturer='${manufacturer}'`, (err, results) => {
           if (err) {
             res.status(500).send('Error searching for products');
@@ -199,7 +190,7 @@ app.get('/search', (req, res) => {
         });
       }
 
-      else if (manufacturer.length === 0 && search.length > 0 && onePrice != undefined && twoPrice === undefined) {
+      else if (manufacturer.length === 0 && search.length > 0 && onePrice != undefined && (twoPrice === undefined || twoPrice === '729.325')) {
         conn.query(`SELECT * FROM product WHERE price >= ${Number(onePrice)} AND price <= ${200000000}  AND model='${search}'`, (err, results) => {
           if (err) {
             res.status(500).send('Error searching for products');
@@ -209,7 +200,7 @@ app.get('/search', (req, res) => {
         });
       }
 
-      else if (manufacturer.length > 0 && search.length > 0 && onePrice != undefined && twoPrice === undefined) {
+      else if (manufacturer.length > 0 && search.length > 0 && onePrice != undefined && (twoPrice === undefined || twoPrice === '729.325')) {
         conn.query(`SELECT * FROM product WHERE price >= ${Number(onePrice)} AND price <= ${200000000}  AND model='${search}' AND manufacturer='${manufacturer}'`, (err, results) => {
           if (err) {
             res.status(500).send('Error searching for products');
@@ -220,8 +211,8 @@ app.get('/search', (req, res) => {
       }
     }
 
-    if (onePrice === undefined && twoPrice != undefined) {
-      if (manufacturer.length === 0 && search.length === 0 && onePrice === undefined && twoPrice != undefined) {
+    if (onePrice === undefined && twoPrice != undefined || onePrice === '729.325' ||  twoPrice === '729.325') {
+      if (manufacturer.length === 0 && search.length === 0 && (onePrice === undefined || onePrice === '729.325') && twoPrice != undefined) {
         conn.query(`SELECT * FROM product WHERE price >= ${0} AND price <= ${Number(twoPrice)}`, (err, results) => {
           if (err) {
             res.status(500).send('Error searching for products');
@@ -231,7 +222,7 @@ app.get('/search', (req, res) => {
         });
       }
 
-      else if (manufacturer.length > 0 && search.length === 0 && onePrice === undefined && twoPrice != undefined) {
+      else if (manufacturer.length > 0 && search.length === 0 && (onePrice === undefined || onePrice === '729.325') && twoPrice != undefined) {
         conn.query(`SELECT * FROM product WHERE price >= ${0} AND price <= ${Number(twoPrice)} AND manufacturer='${manufacturer}'`, (err, results) => {
           if (err) {
             res.status(500).send('Error searching for products');
@@ -241,7 +232,7 @@ app.get('/search', (req, res) => {
         });
       }
 
-      else if (manufacturer.length === 0 && search.length > 0 && onePrice === undefined && twoPrice != undefined) {
+      else if (manufacturer.length === 0 && search.length > 0 && (onePrice === undefined || onePrice === '729.325') && twoPrice != undefined) {
         conn.query(`SELECT * FROM product WHERE price >= ${0} AND price <= ${Number(twoPrice)} AND model='${search}'`, (err, results) => {
           if (err) {
             res.status(500).send('Error searching for products');
@@ -251,7 +242,7 @@ app.get('/search', (req, res) => {
         });
       }
 
-      else if (manufacturer.length > 0 && search.length > 0 && onePrice === undefined && twoPrice != undefined) {
+      else if (manufacturer.length > 0 && search.length > 0 && (onePrice === undefined || onePrice === '729.325') && twoPrice != undefined) {
         conn.query(`SELECT * FROM product WHERE price >= ${0} AND price <= ${Number(twoPrice)} AND model='${search}' AND manufacturer='${manufacturer}'`, (err, results) => {
           if (err) {
             res.status(500).send('Error searching for products');
@@ -262,7 +253,7 @@ app.get('/search', (req, res) => {
       }
     }
 
-      if (onePrice != undefined && twoPrice != undefined) {
+      if (onePrice != undefined && twoPrice != undefined || onePrice != '729.325' ||  twoPrice != '729.325') {
         if (manufacturer.length === 0 && search.length === 0 && onePrice != undefined && twoPrice != undefined) {
           conn.query(`SELECT * FROM product WHERE price >= ${Number(onePrice)} AND price <= ${Number(twoPrice)}`, (err, results) => {
           if (err) {
@@ -273,7 +264,7 @@ app.get('/search', (req, res) => {
         });
         }
   
-        else if (manufacturer.length > 0 && search.length === 0 && onePrice != undefined && twoPrice != undefined) {
+        else if (manufacturer.length > 0 && search.length === 0 && onePrice != undefined && onePrice != '729.325' && twoPrice != undefined && twoPrice != '729.325') {
           conn.query(`SELECT * FROM product WHERE price >= ${Number(onePrice)} AND price <= ${Number(twoPrice)} AND manufacturer='${manufacturer}'`, (err, results) => {
             if (err) {
               res.status(500).send('Error searching for products');
@@ -283,7 +274,7 @@ app.get('/search', (req, res) => {
           });
         }
   
-        else if (manufacturer.length === 0 && search.length > 0 && onePrice != undefined && twoPrice != undefined) {
+        else if (manufacturer.length === 0 && search.length > 0 && onePrice != undefined && onePrice != '729.325' && twoPrice != undefined && twoPrice != '729.325') {
           conn.query(`SELECT * FROM product WHERE price >= ${Number(onePrice)} AND price <= ${Number(twoPrice)} AND model='${search}'`, (err, results) => {
             if (err) {
               res.status(500).send('Error searching for products');
@@ -293,7 +284,7 @@ app.get('/search', (req, res) => {
           });
         }
   
-        else if (manufacturer.length > 0 && search.length > 0 && onePrice != undefined && twoPrice != undefined) {
+        else if (manufacturer.length > 0 && search.length > 0 && onePrice != undefined && onePrice != '729.325' && twoPrice != undefined && twoPrice != '729.325') {
           conn.query(`SELECT * FROM product WHERE price >= ${Number(onePrice)} AND price <= ${Number(twoPrice)} AND manufacturer='${manufacturer}' AND model='${search}'`, (err, results) => {
             if (err) {
               res.status(500).send('Error searching for products');
@@ -303,152 +294,8 @@ app.get('/search', (req, res) => {
           });
         }
       }
-    
-
-
-//     if (manufacturer === undefined) {
-//       console.log('обычный посик')
-//       if (search.length > 0) {
-//         conn.query(`SELECT * FROM product WHERE model='${search}'`, (err, results) => {
-//           if (err) {
-//             console.log('ошибка первый этап')
-//             res.status(500).send('Error searching for products');
-//             return;
-//           }
-//           res.json(results);
-//         });
-//       }
-//     }
-    
-//     if (search != undefined && manufacturer != undefined &&  twoPrice === undefined && onePrice === undefined ) {
-//       if (manufacturer.length > 0 && search.length === 0) {
-//         console.log(`первый этап ${manufacturer} ${search}`)
-//         conn.query(`SELECT * FROM product WHERE manufacturer='${manufacturer}'`, (err, results) => {
-//           if (err) {
-//             console.log('ошибка первый этап')
-//             res.status(500).send('Error searching for products');
-//             return;
-//           }
-//           res.json(results);
-//         });
-//       }
-//     else if (search.length > 0 && manufacturer.length > 0) { 
-//       console.log(`второй этап ${manufacturer} ${search}`)
-//       conn.query(`SELECT * FROM product WHERE manufacturer='${manufacturer}' AND model='${search}'`, (err, results) => {
-//         if (err) {
-//           res.status(500).send('Error searching for products');
-//           return;
-//         }
-//         res.json(results);
-//       });
-//     }
-//     }
-//     //  else {
-//     //   console.log('пизда')
-//     //   console.log(manufacturer)
-//     //   console.log(search)
-//     // }
-
-//     if (typeof(manufacturer) === String && twoPrice != undefined && onePrice != undefined) {
-//       console.log('они undefined')
-//     } 
-//     if (manufacturer === String  && search.length === 0 &&  twoPrice != undefined && onePrice != undefined) {
-//       console.log('они строки')
-//       // if (manufacturer.length === 0 && search.length === 0) {
-//       //   console.log('они строки и равны нулю')
-//       // } else if (manufacturer.length > 0 && search.length > 0) {
-//       //   console.log('они строки и больше нуля')
-//       // }
-//     }
-
-//     // if (manufacturer === undefined && search === undefined && twoPrice != undefined && onePrice != undefined) {
-//     //     console.log('цена работает')
-//     //     conn.query(`SELECT * FROM product WHERE price >= ${onePrice} AND price <= ${twoPrice}`, (err, results) => {
-//     //       if (err) {
-//     //         res.status(500).send('Error searching for products');
-//     //         return;
-//     //       }
-//     //       res.json(results);
-//     //     });
-      
-//     // }
-   
-//     if (search.length > 0  && twoPrice != undefined && onePrice != undefined && twoPrice != undefined && onePrice != undefined) {
-//       console.log('факт')
-//     }
-// });
-
-
-
-// app.get('/manufacturer', (req, res) => {
-//   const searchMan = req.query.term;
-//   conn.query(`SELECT * FROM product WHERE manufacturer='${searchMan}'`, (err, results) => {
-//     if (err) {
-//       res.status(500).send('Error searching for products');
-//       return;
-//     }
-//     res.json(results);
-//   });
-// });
-
-
-// app.get('/price', (req, res) => {
-  
-//   const OnePrice = req.query.one;
-//   const TwoPrice = req.query.two;
-//   conn.query(`SELECT * FROM product WHERE price >= ${OnePrice} AND price <= ${TwoPrice}`, (err, results) => {
-//     if (err) {
-//       res.status(500).send('Error searching for products');
-//       return;
-//     }
-//     res.json(results);
-//   });
 });
 
-
-
-
-
-
-// import TelegramBot from 'node-telegram-bot-api'
-// const bot = new TelegramBot('7036704223:AAGtQiamejcw9_sr2imXXWg_p64ok07M_qI', { polling: true });
-
-
-// Маршрут для обработки запросов от вашего веб-приложения
-
-
-    // bot.on('message', (msg) => {
-    //       const chatId = msg.chat.id;
-    //       app.post('/telebot', (req, res) => {
-    //         const {name} = req.body;
-    //         let a = 'sdasd'  
-    //         if (a.length > 0) {
-    //           bot.sendMessage(chatId, 'Привет! Я простой телеграм бот. Чем могу помочь?\nпривет');
-    //       }
-    //       })
-    //        if (msg.text === '/info') {
-    //           bot.sendMessage(chatId, 'Это информационное сообщение от телеграм бота.');
-    //       } else {
-    //           bot.sendMessage(chatId, 'Я не понимаю такого сообщения. Попробуйте еще раз.');
-    //       }
-    //       });
-
-// import TelegramBot from 'node-telegram-bot-api'
-
-// const bot = new TelegramBot('YOUR_TELEGRAM_BOT_TOKEN', { polling: true });
-
-// app.post('/telebot', (req, res) => {
-//   const chatId = '953111621'
-//   const message = req.body.name; // Сообщение, которое нужно отправить
-
-//   bot.sendMessage(chatId, message)
-//     .then(() => {
-//       res.status(200).send('Message sent');
-//     })
-//     .catch((error) => {
-//       res.status(500).send('Error sending message');
-//     });
-// });
 
 
 import TelegramBot from 'node-telegram-bot-api'
@@ -484,23 +331,51 @@ import { unescape } from 'querystring'
       }
     });
 
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function(req, file, cb) {
+    cb(null, file.originalname);
+  }
+});
 
-    const storage = multer.diskStorage({
-      destination: function (req, file, cb) {
-        cb(null, 'uploads/')
-      },
-      filename: function (req, file, cb) {
-        cb(null, file.originalname)
-      }
+const upload = multer({ storage });
+
+function generateAndCheckId() {
+  return Math.floor(Math.random() * 900) + 100;
+}
+
+app.post('/upload', upload.single('photo'), (req, res) => {
+    const photoPath = req.file.path;
+    let title = req.body.title,
+    model = req.body.model,
+    manufacturer = req.body.manufacturer,
+    square = req.body.square,
+    price = req.body.price
+      const sql = `INSERT INTO product(id, title, model, manufacturer, square, price, img) VALUES(${generateAndCheckId()}, '${title}', '${model}',' ${manufacturer}', ${square}, ${price}, '${photoPath.substr(7)}')`
+      conn.query(sql, function(err, results) {
+        if(err) console.log(err);
+        console.log(results);
     });
-    
-    const upload = multer({ storage: storage });
-    
-    app.post('/upload', upload.single('image'), (req, res) => {
-      res.send(req.file);
-    });
-    
-    app.use(express.static('uploads'));
+});
+
+app.post('/api/orders', (req, res) => {
+  const { products } = req.body;
+
+  conn.query('INSERT INTO orders (products) VALUES (?)', [products.join(', ')], (error, results) => {
+    if (error) {
+      console.error('Ошибка при сохранении заказа:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    } else {
+      console.log('Заказ успешно сохранен');
+      res.status(201).json({ message: 'Заказ успешно сохранен' });
+    }
+  });
+});
+
+
+app.use(express.static('uploads'));
 app.listen(PORT, ()=> {
     console.log(`Все работае! Ваш порт ${PORT}`)
 }) //запуск приложения
