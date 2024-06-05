@@ -353,12 +353,13 @@ app.post('/upload', upload.single('photo'), (req, res) => {
     manufacturer = req.body.manufacturer,
     square = req.body.square,
     price = req.body.price
-      const sql = `INSERT INTO product(id, title, model, manufacturer, square, price, img) VALUES(${generateAndCheckId()}, '${title}', '${model}',' ${manufacturer}', ${square}, ${price}, '${photoPath.substr(7)}')`
+      const sql = `INSERT INTO product(title, model, manufacturer, square, price, img) VALUES('${title}', '${model}','${manufacturer}', ${square}, ${price}, '${photoPath.substr(7)}')`
       conn.query(sql, function(err, results) {
         if(err) console.log(err);
         console.log(results);
     });
 });
+
 
 app.post('/api/orders', (req, res) => {
   const { products } = req.body;
