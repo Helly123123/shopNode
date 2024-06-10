@@ -15,7 +15,6 @@ export const login = function(req, res) {
       if (results.length > 0) {
         let candidatPas = conn.query('SELECT password FROM users WHERE email = ?', [email], (error, passBd) =>{
           if (error) {
-            console.log(error)
           }else {
             let pasbdUwer = passBd[0].password
             const passwordResult = bicrypt.compareSync(req.body.password, pasbdUwer)
@@ -27,7 +26,6 @@ export const login = function(req, res) {
                   }, 'dev-jsv', {expiresIn: 60 * 60})
                   let candidatName = conn.query('SELECT name FROM users WHERE email = ?', [email], (error, nameBd) =>{
                     if (error) {
-                      console.log(error)
                     }else {
                       const data = {
                         name: nameBd[0].name,
@@ -74,7 +72,7 @@ export const register = async function(req, res) {
                 function generateUserId() {
                   return Math.floor(Math.random() * 1000) + 1; // Генерация случайного числа от 1 до 1000
               }
-            conn.query(`INSERT INTO users(id, name, email, password, number) VALUES(${generateUserId()},'${name}', '${email}', '${password}', 88)`, (err, result) => {
+            conn.query(`INSERT INTO users(id, name, email, password) VALUES(${generateUserId()},'${name}', '${email}', '${password}')`, (err, result) => {
               if (err) {
                 console.error('Error adding user: ' + err.stack);
                 return;

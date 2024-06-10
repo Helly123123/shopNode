@@ -2,8 +2,6 @@ import express from 'express'
 
 import passport from 'passport'
 import {requserTime, Logger} from './middlewares.js'
-import serverRouts from './routs/server.js'
-import productRouts from './routs/addProduct.js'
 import createDiscount from './routs/createDiscount.js'
 import deleteDiscount from './routs/deleteDiscount.js'
 import authRouts from './routs/auth.js'
@@ -43,8 +41,8 @@ app.use(requserTime)
 app.use(Logger)
 
 import bodyParser from 'body-parser'
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+app.use( bodyParser.json() );     
+app.use(bodyParser.urlencoded({  
   extended: true
 }));
 
@@ -54,8 +52,6 @@ app.use(searchProductDB)
 app.use(deleteDiscount)
 app.use(createDiscount)
 app.use(authRouts)
-app.use(serverRouts)
-app.use(productRouts)
 app.use(databaseRouts)
 
 
@@ -67,7 +63,6 @@ app.post('/send-email', async(req, res) => {
     } else {
       if (results.length > 0) {
         res.status(200).send('привет') 
-        console.log('емаил')
       } else {
         const transporter = nodemailer.createTransport({
           host: "smtp.mail.ru",
@@ -81,7 +76,7 @@ app.post('/send-email', async(req, res) => {
             transporter.sendMail({
             from: "maksim.birykov.2007@mail.ru",
             to: email,
-            subject: "привет",
+            subject: "Код регистрации",
             html:
             `
             <style>
@@ -89,8 +84,11 @@ app.post('/send-email', async(req, res) => {
               color: red;
             }
             </style>
-            <p class = "x" >Ваш код</p>
-            <p>${code}</p>
+            <p>Приветствуем Вас!
+          Спасибо за регистрацию на нашем сайте. Ваш уникальный код для подтверждения регистрации: <b>${code}</b>. <br/> Пожалуйста, введите этот код на странице, чтобы завершить процесс регистрации.
+          <br/> <br/> Если у Вас возникнут какие-либо вопросы или проблемы, не стесняйтесь обратиться к нашей службе поддержки.
+          <br/> <br/> С уважением,
+          Команда Cold Wind.</p>
             `
         })
         res.status(201).send('ку')
@@ -99,18 +97,12 @@ app.post('/send-email', async(req, res) => {
   
 })});
 
-
 app.post('/send-test', async(req, res) => {
   try {
     const { code } = req.body
-    console.log(code)
   }
   catch (e) {
-    console.log(e)
   }})
-
-
-
 
 app.get('/search', (req, res) => {
   let search = req.query.search,
@@ -118,27 +110,18 @@ app.get('/search', (req, res) => {
     onePrice =  req.query.onePrice,
     twoPrice =  req.query.twoPrice
 
-     console.log('============================================')
-     console.log('производ ' + manufacturer + '' + typeof(manufacturer))
-     console.log('модель ' + search + '' + typeof(search))
-     console.log('первый' + onePrice + '' + typeof(onePrice))
-     console.log('второй ' + twoPrice + '' + typeof(twoPrice))
-     console.log('============================================')
-
     if (search.length === 0 && manufacturer.length === 0 && onePrice === undefined && twoPrice === undefined) {
         conn.query('SELECT * FROM product', (err, results) => {
         if (err) {
           console.error('Ошибка выполнения запроса: ' + err.stack);
           return res.status(500).send('Ошибка выполнения запроса');
         }
-        
         res.json(results);
       });
     }
     else if (search.length > 0 && manufacturer.length === 0 && onePrice === undefined && twoPrice === undefined) {
       conn.query(`SELECT * FROM product WHERE model='${search}'`, (err, results) => {
                   if (err) {
-                    console.log('ошибка первый этап')
                     res.status(500).send('Error searching for products');
                     return;
                   }
@@ -160,7 +143,6 @@ app.get('/search', (req, res) => {
       else if (manufacturer.length > 0 && search.length === 0) {
         conn.query(`SELECT * FROM product WHERE manufacturer='${manufacturer}'`, (err, results) => {
           if (err) {
-            console.log('ошибка первый этап')
             res.status(500).send('Error searching for products');
             return;
           }
@@ -296,41 +278,6 @@ app.get('/search', (req, res) => {
       }
 });
 
-
-
-import TelegramBot from 'node-telegram-bot-api'
-import { unescape } from 'querystring'
-    const token = '7036704223:AAGtQiamejcw9_sr2imXXWg_p64ok07M_qI';
-
-    export const bot = new TelegramBot(token, { polling: true });
-
-
-    bot.onText('/start', (msg) => {
-      // Создание объекта с кнопками
-      const options = {
-        parse_mode: 'HTML',
-        reply_markup: JSON.stringify({
-          inline_keyboard: [
-            [{ text: 'Общая выручка', callback_data: 'btn1' }, { text: 'История покупок', callback_data: 'btn2' }]
-          ]
-        })
-      };
-    
-      // Отправка сообщения с кнопками
-      bot.sendMessage(msg.chat.id, '<b>Добро пожаловать в статистику магазина!</b>',options);
-    });
-    
-    bot.on('callback_query', (query) => {
-      const data = query.data;
-    
-    if(data === 'btn1') {
-
-      } else if (data === 'btn2') {
-        
-
-      }
-    });
-
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, 'uploads/');
@@ -355,8 +302,7 @@ app.post('/upload', upload.single('photo'), (req, res) => {
     price = req.body.price
       const sql = `INSERT INTO product(title, model, manufacturer, square, price, img) VALUES('${title}', '${model}','${manufacturer}', ${square}, ${price}, '${photoPath.substr(7)}')`
       conn.query(sql, function(err, results) {
-        if(err) console.log(err);
-        console.log(results);
+        if(err);
     });
 });
 
@@ -366,10 +312,8 @@ app.post('/api/orders', (req, res) => {
 
   conn.query('INSERT INTO orders (products) VALUES (?)', [products.join(', ')], (error, results) => {
     if (error) {
-      console.error('Ошибка при сохранении заказа:', error);
       res.status(500).json({ message: 'Ошибка сервера' });
     } else {
-      console.log('Заказ успешно сохранен');
       res.status(201).json({ message: 'Заказ успешно сохранен' });
     }
   });
@@ -378,5 +322,4 @@ app.post('/api/orders', (req, res) => {
 
 app.use(express.static('uploads'));
 app.listen(PORT, ()=> {
-    console.log(`Все работае! Ваш порт ${PORT}`)
 }) //запуск приложения
